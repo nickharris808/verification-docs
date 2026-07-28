@@ -1,0 +1,69 @@
+site_name: A verdict you cannot check is not a verdict
+site_description: Verification tools that refuse to guess — model checking, benchmarks that cannot be memorised, and a three-valued verdict that never rounds up.
+site_url: https://nickharris808.github.io/verification-docs/
+repo_url: https://github.com/nickharris808/verification-docs
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle: {icon: material/brightness-7, name: Switch to dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle: {icon: material/brightness-4, name: Switch to light mode}
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight: {anchor_linenums: true}
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - toc: {permalink: true}
+
+nav:
+  - Start here: index.md
+  - Concepts:
+      - The three-valued verdict: concepts/verdicts.md
+      - What "proved" actually means: concepts/what-it-proves.md
+  - Guides:
+      - Tutorial — from a bug to a proof: guides/tutorial.md
+      - How this compares: guides/comparison.md
+      - Questions and objections: guides/faq.md
+      - Architecture notes: guides/architecture.md
+      - Contributing: guides/contributing.md
+  - Tools:
+      - minicheck: tools/minicheck.md
+      - specforge: tools/specforge.md
+      - protocol-bench: tools/protocol-bench.md
+      - minicheck-mcp: tools/minicheck-mcp.md
+      - minicheck-action: tools/minicheck-action.md
+      - failclosed: tools/failclosed.md
+      - polyfrac: tools/polyfrac.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nickharris808
+    - icon: fontawesome/solid/database
+      link: https://huggingface.co/nickh007
