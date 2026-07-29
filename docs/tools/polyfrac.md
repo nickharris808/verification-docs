@@ -1,12 +1,12 @@
 # polyfrac
 
-**Exact rational arithmetic with Sturm root counting**
+**Exact real-root counting over the rationals**
 
-Exact counts of distinct real roots in an interval. Refuses float input rather than silently approximating.
+Sturm's theorem over exact rational arithmetic: the number of distinct real roots in an interval, as an integer, with no floating point anywhere.
 
 [:material-github: Source](https://github.com/nickharris808/polyfrac){ .md-button }
 
-66 tests · ~390 lines of source · MIT
+68 tests · ~390 lines of source · MIT
 
 ## Install
 
@@ -53,4 +53,5 @@ the count comes from sign changes in a Sturm chain over exact rationals.
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/polyfrac#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/polyfrac#readme).

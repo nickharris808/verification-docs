@@ -1,21 +1,18 @@
 # minicheck-action
 
-**Model-check specs in CI**
+**Model-check every spec in a repository, in CI**
 
-Checks every spec in a repo, posts the counterexample as a diagram, uploads SARIF. UNDETERMINED fails the job.
+Counterexamples render as diagrams in the pull request and as SARIF in the Security tab. UNDETERMINED fails the job by default.
 
 [:material-github: Source](https://github.com/nickharris808/minicheck-action){ .md-button }
 
 20 tests · MIT
 
-## Install
+## Use it
 
-```console
-$ pip install "minicheck-action @ git+https://github.com/nickharris808/minicheck-action.git"
+```yaml
+- uses: nickharris808/minicheck-action@v1
 ```
-
-!!! note
-    `pip install minicheck-action` does not work yet — nothing here is on PyPI. Install from GitHub.
 
 ## Honest scope
 
@@ -31,4 +28,5 @@ exceeding either yields `UNDETERMINED`, never a quiet pass.
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/minicheck-action#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/minicheck-action#readme).

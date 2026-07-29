@@ -2,11 +2,13 @@
 
 **A benchmark that cannot be memorised**
 
-Generates protocol-shaped verification tasks whose ground truth is computed by an exhaustive checker rather than written down.
+Generates protocol-shaped verification tasks whose ground truth is computed by an exhaustive checker rather than written down. Change the seed and nothing has seen the task set.
 
 [:material-github: Source](https://github.com/nickharris808/specforge){ .md-button }
+[:material-database: Dataset](https://huggingface.co/datasets/nickh007/specforge){ .md-button }
+[:material-trophy: Leaderboard](https://huggingface.co/spaces/nickh007/specforge-leaderboard){ .md-button }
 
-38 tests · ~736 lines of source · MIT
+77 tests · ~741 lines of source · MIT
 
 ## Install
 
@@ -43,4 +45,5 @@ for it. The open problem is doing this from a description.
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/specforge#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/specforge#readme).

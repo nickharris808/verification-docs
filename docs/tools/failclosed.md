@@ -1,12 +1,12 @@
 # failclosed
 
-**Default-deny ASGI middleware**
+**Default-deny middleware for a verification-gated endpoint**
 
-A gated endpoint succeeds only on an affirmative machine-checked verdict. Unknown is refused, not permitted.
+A gated path succeeds only on an affirmative machine-checked verdict. There is no code path from 'we could not determine safety' to a success status.
 
 [:material-github: Source](https://github.com/nickharris808/failclosed){ .md-button }
 
-60 tests · ~301 lines of source · MIT
+62 tests · ~301 lines of source · MIT
 
 ## Install
 
@@ -62,4 +62,5 @@ This middleware is MIT and always will be.
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/failclosed#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/failclosed#readme).

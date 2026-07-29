@@ -58,6 +58,7 @@ nav:
       - protocol-bench: tools/protocol-bench.md
       - minicheck-mcp: tools/minicheck-mcp.md
       - minicheck-action: tools/minicheck-action.md
+      - protocol-bench-action: tools/protocol-bench-action.md
       - failclosed: tools/failclosed.md
       - polyfrac: tools/polyfrac.md
 

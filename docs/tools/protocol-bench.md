@@ -1,12 +1,14 @@
 # protocol-bench
 
-**Fixed, reviewed ground truth where a detection must replay**
+**Ground truth from published standards, where a detection must replay**
 
-15 published IEEE 802.11 / 3GPP procedures with human-reviewed labels. A claimed detection only counts when its trace replays.
+Fifteen IEEE 802.11 and 3GPP procedures with named safety properties and reviewed labels. A claimed counterexample is replayed against the model before it earns credit.
 
 [:material-github: Source](https://github.com/nickharris808/protocol-bench){ .md-button }
+[:material-database: Dataset](https://huggingface.co/datasets/nickh007/protocol-bench){ .md-button }
+[:material-play: Live demo](https://huggingface.co/spaces/nickh007/protocol-bench-demo){ .md-button }
 
-122 tests · ~1285 lines of source · MIT
+125 tests · ~1290 lines of source · MIT
 
 ## Install
 
@@ -59,4 +61,5 @@ ignored by the headline metric. See [SECURITY-ADVISORY.md](https://github.com/ni
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/protocol-bench#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/protocol-bench#readme).

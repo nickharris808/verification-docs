@@ -1,12 +1,12 @@
 # minicheck
 
-**An explicit-state model checker with no required dependencies**
+**An explicit-state model checker you can read in an afternoon**
 
-Describe a finite state machine, assert an invariant, get a shortest counterexample. Or a proof. Or an honest *undetermined*.
+Describe a finite state machine, assert an invariant, get back the shortest concrete trace that breaks it. No required dependencies.
 
 [:material-github: Source](https://github.com/nickharris808/minicheck){ .md-button }
 
-229 tests · ~2826 lines of source · MIT
+270 tests · ~2888 lines of source · MIT
 
 ## Install
 
@@ -50,15 +50,25 @@ breadth-first.
 - Nothing when an invariant is trivially satisfied. `spec_warnings` reports a condition that names a
   value the bounded space cannot represent; such a condition genuinely holds, but it verifies nothing.
 
-**Measured performance.** Declarative specs (`protocol_from_spec`, the CLI, the MCP server) run at
-roughly **3.2×10⁵ to 1.0×10⁶ states/second** in CPython on an M-series laptop. The spec's guards and
-assignments are compiled to index tuples once at build time rather than re-interpreted on every
-visited state, which is a **measured 2.8× mean speedup** (2.06×–3.15×) over 0.2.0 across four
-workloads. Verified by a differential test that requires the compiled and interpreted paths to agree
-on every successor of every reachable state, so the optimisation cannot change a verdict.
-Models built from a Python `transitions` callable run at roughly 1.4×10⁵–3.2×10⁵ states/second — for
-those, profiling shows ~80% of the time is inside *your* callable, so the engine is not the limit. That is the honest ceiling: this is a readable reference implementation,
-not a competitor to SPIN, TLC or NuSMV on industrial models.
+**Measured performance — run `python bench.py` to reproduce all of it on your own machine.**
+Declarative specs (`protocol_from_spec`, the CLI, the MCP server) run at roughly **2.5×10⁵ to 7.5×10⁵
+states/second** in CPython 3.11 on an M-series laptop — the spread is across workload shapes, and it
+moves by ±15% between runs on the same machine, so treat it as an order of magnitude rather than a
+figure.
+
+The spec's guards and assignments are compiled to index tuples once at build time rather than
+re-interpreted on every visited state. `bench.py` measures that against the *pre-optimisation*
+transition function, which it re-implements inline — so the comparison needs nothing but this
+repository, and the baseline is the same oracle `tests/test_adversarial_soundness.py` uses to prove
+the two agree on every successor of every reachable state. The optimisation therefore cannot change
+a verdict. On the reference machine the mean is **4.7×** (range 2.7×–6.6×); the guarantee the test
+suite enforces is the floor, **never below 2× on any benchmarked workload**.
+
+Models built from a Python `transitions` callable are bounded by *your* function, not by the engine —
+profiling puts ~80% of the time inside it. `bench.py`'s deliberately trivial callable reaches
+~2×10⁶ states/second, which is the ceiling you approach as the callable gets cheaper, not a figure to
+expect from a real one. That is the honest ceiling overall: this is a readable reference
+implementation, not a competitor to SPIN, TLC or NuSMV on industrial models.
 
 **A soundness bug shipped in 0.1.0 and is fixed here.** `int_bound` was applied as a *clamp*, so a
 counter that genuinely reached 100 saturated at 64 and a `never reach 100` invariant was reported as
@@ -66,4 +76,5 @@ holding. See [SECURITY-ADVISORY.md](https://github.com/nickharris808/minicheck/b
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/minicheck#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/minicheck#readme).

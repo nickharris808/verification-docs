@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use these tools, please cite them as below."
+title: "verification-docs: documentation for a portfolio of verification tools that refuse to guess"
+abstract: >-
+  The front door for a set of small verification tools built around one rule: a verdict you cannot
+  check is not a verdict, and undetermined is never a pass. Covers the three-valued verdict contract,
+  what an explicit-state check does and does not prove, and how the tools compose.
+authors:
+  - family-names: Harris
+    given-names: Nick
+repository-code: "https://github.com/nickharris808/verification-docs"
+url: "https://nickharris808.github.io/verification-docs/"
+license: MIT
+type: software
+keywords:
+  - formal-methods
+  - model-checking
+  - verification
+  - documentation

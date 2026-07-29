@@ -2,11 +2,11 @@
 
 **The checker as an MCP server**
 
-Gives an agent a decision procedure instead of prose reasoning. Specs are data, never code.
+Lets an agent verify a state machine instead of reasoning about it in prose. Specs are data, never code, so nothing the agent submits is executed.
 
 [:material-github: Source](https://github.com/nickharris808/minicheck-mcp){ .md-button }
 
-96 tests · ~437 lines of source · MIT
+97 tests · ~437 lines of source · MIT
 
 ## Install
 
@@ -58,4 +58,5 @@ the declarative loader exists rather than accepting Python.
 
 ---
 
-Full documentation, quickstart and troubleshooting live in the [repository README](https://github.com/nickharris808/minicheck-mcp#readme).
+Full documentation, quickstart and troubleshooting live in the
+[repository README](https://github.com/nickharris808/minicheck-mcp#readme).
