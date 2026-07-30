@@ -16,8 +16,11 @@ Generates protocol-shaped verification tasks whose ground truth is computed by a
 $ pip install "specforge @ git+https://github.com/nickharris808/specforge.git"
 ```
 
-!!! note
-    `pip install specforge` does not work yet — nothing here is on PyPI. Install from GitHub.
+!!! warning "Do not run `pip install specforge`"
+    The name `specforge` on PyPI belongs to somebody else — it is [SGLang's SpecForge](https://github.com/sgl-project/SpecForge), an unrelated
+    project. `pip install specforge` **does not fail**: it succeeds and installs that project instead of
+    this one. Always install from GitHub with the quoted URL above, until this package is released
+    under a name of its own.
 
 ## Honest scope
 

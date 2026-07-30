@@ -97,6 +97,16 @@ Full documentation, quickstart and troubleshooting live in the
 [repository README]({github}/{name}#readme).
 """
 
+#: Names on PyPI that belong to SOMEBODY ELSE. For these, "does not work yet" is FALSE and
+#: dangerous: the command succeeds and installs an unrelated project. The generic template flattened
+#: that distinction and shipped the wrong warning to a live page for `specforge`.
+#:
+#: Each value is the owning project, stated factually. This is a fact about a name in a public index,
+#: not a claim about the other project's software — nothing here evaluates or criticises it.
+NAME_TAKEN_ON_PYPI = {
+    "specforge": ("SGLang's SpecForge", "https://github.com/sgl-project/SpecForge"),
+}
+
 INSTALL = """## Install
 
 ```console
@@ -105,6 +115,22 @@ $ pip install "{name} @ git+{github}/{name}.git"
 
 !!! note
     `pip install {name}` does not work yet — nothing here is on PyPI. Install from GitHub.
+
+"""
+
+#: The name resolves, but to someone else's project. A user who reads "does not work" and tries it
+#: anyway gets a SUCCESSFUL install of the wrong software — which is why this wording differs.
+INSTALL_NAME_TAKEN = """## Install
+
+```console
+$ pip install "{name} @ git+{github}/{name}.git"
+```
+
+!!! warning "Do not run `pip install {name}`"
+    The name `{name}` on PyPI belongs to somebody else — it is [{owner}]({owner_url}), an unrelated
+    project. `pip install {name}` **does not fail**: it succeeds and installs that project instead of
+    this one. Always install from GitHub with the quoted URL above, until this package is released
+    under a name of its own.
 
 """
 
@@ -118,18 +144,49 @@ USES = """## Use it
 
 
 def count_tests(root: pathlib.Path) -> int | None:
-    """Collect-only, so the number is the repository's own rather than this script's guess."""
+    """Collect-only, so the number is the repository's own rather than this script's guess.
+
+    REFUSES on a failed collection. This function used to read pytest's trailing integer without
+    looking at the exit status, and on 2026-07-30 that published four wrong counts to live pages in
+    one command: minicheck 270 -> 10, protocol-bench 125 -> 13, minicheck-mcp 97 -> 7, specforge
+    77 -> 2. The cause was mundane — the packages were not installed, so collection aborted with
+    `ModuleNotFoundError` and pytest printed "10 tests collected, 9 errors". The regex took the 10.
+
+    A count derived from a collection that FAILED is not a smaller count; it is not a count at all.
+    Publishing it is the vacuous-pass class wearing a documentation-generator costume, so this now
+    raises rather than degrading quietly.
+    """
     if not (root / "tests").is_dir():
         return None
     out = subprocess.run(
         [sys.executable, "-m", "pytest", "tests", "--collect-only", "-q", "-p", "no:cacheprovider"],
         capture_output=True, text=True, cwd=root,
     )
+    blob = out.stdout + out.stderr
+    if out.returncode == 5:
+        return 0  # "no tests ran" is a real, honest zero
+    if out.returncode != 0 or re.search(r"\berrors?\b", blob):
+        raise SystemExit(
+            f"REFUSING to count tests for {root.name}: collection did not succeed "
+            f"(exit {out.returncode}). Publishing pytest's partial number would understate the "
+            f"suite — this is exactly how 270 became 10. Install the packages first:\n"
+            f"    python3 -m venv .venv && .venv/bin/pip install -e '{root}[test]'\n"
+            f"then re-run. Tail of collection output:\n"
+            + "\n".join(blob.strip().splitlines()[-3:]))
     lines = [ln for ln in out.stdout.strip().splitlines() if ln.strip()]
     if not lines:
         return None
-    m = re.match(r"(\d+)", lines[-1])
-    return int(m.group(1)) if m else None
+    last = lines[-1]
+    # pytest -q --collect-only prints "N tests collected" for multi-file runs but "path: N" when a
+    # single file matches. The regex only handled the first shape, so `minicheck-action`'s real 20
+    # silently became "no count at all" — a number dropping out of a published page with no signal.
+    m = re.match(r"(\d+)", last) or re.search(r":\s*(\d+)\s*$", last)
+    if not m:
+        raise SystemExit(
+            f"REFUSING to count tests for {root.name}: collection SUCCEEDED but its output could not "
+            f"be parsed, so the page would silently omit a count that exists. Last line was:\n"
+            f"    {last!r}")
+    return int(m.group(1))
 
 
 def count_lines(root: pathlib.Path) -> int | None:
@@ -154,11 +211,24 @@ def honest_scope(root: pathlib.Path) -> str:
     )
 
 
+#: Published repo name -> the directory it lives in HERE. `protocol-bench-action` is published as one
+#: repository but is assembled locally from `action/` (the `action.yml`) and `action-repo/` (the
+#: README). Without this alias the build aborted at that name and NEVER REACHED `failclosed` or
+#: `polyfrac`, so those two tool pages silently stopped being regenerated — a coverage hole created by
+#: a fail-fast on an unrelated entry.
+LOCAL_DIR_ALIAS = {"protocol-bench-action": "action-repo"}
+
+
 def build(repos: pathlib.Path, out: pathlib.Path) -> None:
+    missing = []
     for name, (tagline, description, pip_installable) in TOOLS.items():
-        root = repos / name
+        root = repos / LOCAL_DIR_ALIAS.get(name, name)
         if not root.is_dir():
-            raise SystemExit(f"{name}: not found under {repos} — refusing to emit a page for it")
+            # Collect and report at the END. Aborting here means one unresolvable entry starves
+            # every entry after it, which is exactly how failclosed and polyfrac went stale.
+            missing.append(name)
+            print(f"  {name:24s} MISSING under {repos} — no page emitted")
+            continue
 
         facts = []
         n = count_tests(root)
@@ -181,14 +251,42 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
                 "\n[:material-trophy: Leaderboard](https://huggingface.co/spaces/nickh007/specforge-leaderboard){ .md-button }"
             )
 
+        if not pip_installable:
+            install = USES.format(name=name, github=GITHUB)
+        elif name in NAME_TAKEN_ON_PYPI:
+            owner, owner_url = NAME_TAKEN_ON_PYPI[name]
+            install = INSTALL_NAME_TAKEN.format(name=name, github=GITHUB,
+                                                owner=owner, owner_url=owner_url)
+        else:
+            install = INSTALL.format(name=name, github=GITHUB)
+
+        # REFUSAL. "does not work yet" asserts the command FAILS. For a name owned by another
+        # project the command succeeds and installs their software, so that sentence would send a
+        # reader to a confident wrong outcome. This is the priority-1 defect class — a documented
+        # command whose stated behaviour is not its real behaviour — so it is fatal, not a lint.
+        if name in NAME_TAKEN_ON_PYPI and "does not work yet" in install:
+            raise SystemExit(
+                f"REFUSING to generate {name}.md: the page would say `pip install {name}` 'does not "
+                f"work yet', but that name on PyPI belongs to {NAME_TAKEN_ON_PYPI[name][0]} and the "
+                f"command SUCCEEDS with their package. Use INSTALL_NAME_TAKEN.")
+
         page = PAGE.format(
             name=name, tagline=tagline, description=description, github=GITHUB,
             extra_button=extra, facts=" · ".join(facts),
-            install=(INSTALL if pip_installable else USES).format(name=name, github=GITHUB),
+            install=install,
             scope=honest_scope(root),
         )
         (out / f"{name}.md").write_text(page, encoding="utf-8")
         print(f"  {name:24s} {' · '.join(facts)}")
+
+    # COVERAGE, printed every run. "8/8 pages" is the denominator that tells a reader whether a
+    # clean result was clean or merely empty.
+    print(f"tool-pages: {len(TOOLS) - len(missing)}/{len(TOOLS)} pages emitted")
+    if missing:
+        raise SystemExit(
+            f"REFUSING: {len(missing)} declared tool(s) produced no page: {missing}. Every other "
+            f"page was still written, so the run is diagnosable — but a docs site missing a tool it "
+            f"declares is not a complete site.")
 
 
 if __name__ == "__main__":

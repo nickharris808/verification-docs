@@ -26,6 +26,14 @@ your spec, not your implementation.
 the spec declares a `goal`, and it cannot verify anything outside `int-bound` or `max-states` —
 exceeding either yields `UNDETERMINED`, never a quiet pass.
 
+**It cannot audit the spec you wrote.** A spec whose invariant is trivially satisfied will show
+`PROVED`, because it genuinely is — it just verifies nothing. `minicheck` emits a warning for that
+case; read the log, not only the badge.
+
+**Failing is best-effort in exactly two places, deliberately.** Rendering a diagram and writing SARIF
+are per-file and non-fatal: a spec too large to draw must not turn a real verdict into a build error.
+The verdict itself is never best-effort.
+
 ---
 
 Full documentation, quickstart and troubleshooting live in the
