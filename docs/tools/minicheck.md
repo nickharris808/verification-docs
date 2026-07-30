@@ -11,11 +11,8 @@ Describe a finite state machine, assert an invariant, get back the shortest conc
 ## Install
 
 ```console
-$ pip install "minicheck @ git+https://github.com/nickharris808/minicheck.git"
+$ pip install minicheck
 ```
-
-!!! note
-    `pip install minicheck` does not work yet — nothing here is on PyPI. Install from GitHub.
 
 ## Honest scope
 

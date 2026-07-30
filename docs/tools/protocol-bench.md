@@ -13,11 +13,8 @@ Fifteen IEEE 802.11 and 3GPP procedures with named safety properties and reviewe
 ## Install
 
 ```console
-$ pip install "protocol-bench @ git+https://github.com/nickharris808/protocol-bench.git"
+$ pip install protocol-bench
 ```
-
-!!! note
-    `pip install protocol-bench` does not work yet — nothing here is on PyPI. Install from GitHub.
 
 ## Honest scope
 

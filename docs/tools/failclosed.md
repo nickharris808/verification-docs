@@ -11,11 +11,8 @@ A gated path succeeds only on an affirmative machine-checked verdict. There is n
 ## Install
 
 ```console
-$ pip install "failclosed @ git+https://github.com/nickharris808/failclosed.git"
+$ pip install failclosed
 ```
-
-!!! note
-    `pip install failclosed` does not work yet — nothing here is on PyPI. Install from GitHub.
 
 ## Honest scope
 

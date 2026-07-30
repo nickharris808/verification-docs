@@ -107,6 +107,29 @@ NAME_TAKEN_ON_PYPI = {
     "specforge": ("SGLang's SpecForge", "https://github.com/sgl-project/SpecForge"),
 }
 
+#: Published by us, and therefore `pip install <name>` WORKS. Declared rather than probed so the
+#: build stays offline and deterministic; `tests/test_install_lines.py` probes PyPI for real and
+#: fails if reality and this table disagree, in either direction.
+#:
+#: This table exists because publishing four packages on 2026-07-30 instantly made the opposite
+#: caveat false on every page. "Not on PyPI yet" is a claim with a shelf life, and the moment it
+#: expired it became the same defect class as the specforge warning above — a documented statement
+#: about a command that does not match what the command does.
+ON_PYPI = {
+    "minicheck": "0.4.0",
+    "protocol-bench": "1.1.0",
+    "polyfrac": "0.2.0",
+    "failclosed": "0.2.0",
+}
+
+INSTALL_PUBLISHED = """## Install
+
+```console
+$ pip install {name}
+```
+
+"""
+
 INSTALL = """## Install
 
 ```console
@@ -251,8 +274,18 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
                 "\n[:material-trophy: Leaderboard](https://huggingface.co/spaces/nickh007/specforge-leaderboard){ .md-button }"
             )
 
+        # A name cannot be both ours-on-PyPI and owned-by-someone-else. If it ever is, the tables
+        # disagree and neither can be trusted — so refuse rather than pick one.
+        if name in ON_PYPI and name in NAME_TAKEN_ON_PYPI:
+            raise SystemExit(
+                f"REFUSING: {name} appears in BOTH ON_PYPI and NAME_TAKEN_ON_PYPI. One says we "
+                f"published it; the other says the name belongs to somebody else. Resolve the "
+                f"contradiction before generating a page that asserts either.")
+
         if not pip_installable:
             install = USES.format(name=name, github=GITHUB)
+        elif name in ON_PYPI:
+            install = INSTALL_PUBLISHED.format(name=name)
         elif name in NAME_TAKEN_ON_PYPI:
             owner, owner_url = NAME_TAKEN_ON_PYPI[name]
             install = INSTALL_NAME_TAKEN.format(name=name, github=GITHUB,

@@ -11,11 +11,8 @@ Sturm's theorem over exact rational arithmetic: the number of distinct real root
 ## Install
 
 ```console
-$ pip install "polyfrac @ git+https://github.com/nickharris808/polyfrac.git"
+$ pip install polyfrac
 ```
-
-!!! note
-    `pip install polyfrac` does not work yet — nothing here is on PyPI. Install from GitHub.
 
 ## Honest scope
 
