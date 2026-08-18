@@ -13,7 +13,7 @@ Generates protocol-shaped verification tasks whose ground truth is computed by a
 ## Install
 
 ```console
-$ pip install "specforge @ git+https://github.com/nickharris808/specforge.git"
+$ pip install "pcar-specforge @ git+https://github.com/nickharris808/specforge.git"
 ```
 
 !!! warning "Do not run `pip install specforge`"
