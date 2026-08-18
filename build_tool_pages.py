@@ -183,7 +183,9 @@ def count_tests(root: pathlib.Path) -> int | None:
         return None
     out = subprocess.run(
         [sys.executable, "-m", "pytest", "tests", "--collect-only", "-q", "-p", "no:cacheprovider"],
-        capture_output=True, text=True, cwd=root,
+        capture_output=True,
+        text=True,
+        cwd=root,
     )
     blob = out.stdout + out.stderr
     if out.returncode == 5:
@@ -194,8 +196,8 @@ def count_tests(root: pathlib.Path) -> int | None:
             f"(exit {out.returncode}). Publishing pytest's partial number would understate the "
             f"suite — this is exactly how 270 became 10. Install the packages first:\n"
             f"    python3 -m venv .venv && .venv/bin/pip install -e '{root}[test]'\n"
-            f"then re-run. Tail of collection output:\n"
-            + "\n".join(blob.strip().splitlines()[-3:]))
+            f"then re-run. Tail of collection output:\n" + "\n".join(blob.strip().splitlines()[-3:])
+        )
     lines = [ln for ln in out.stdout.strip().splitlines() if ln.strip()]
     if not lines:
         return None
@@ -208,7 +210,8 @@ def count_tests(root: pathlib.Path) -> int | None:
         raise SystemExit(
             f"REFUSING to count tests for {root.name}: collection SUCCEEDED but its output could not "
             f"be parsed, so the page would silently omit a count that exists. Last line was:\n"
-            f"    {last!r}")
+            f"    {last!r}"
+        )
     return int(m.group(1))
 
 
@@ -265,13 +268,17 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
         extra = ""
         if name == "protocol-bench":
             extra = (
-                "\n[:material-database: Dataset](https://huggingface.co/datasets/nickh007/protocol-bench){ .md-button }"
-                "\n[:material-play: Live demo](https://huggingface.co/spaces/nickh007/protocol-bench-demo){ .md-button }"
+                "\n[:material-database: Dataset]"
+                "(https://huggingface.co/datasets/nickh007/protocol-bench){ .md-button }"
+                "\n[:material-play: Live demo]"
+                "(https://huggingface.co/spaces/nickh007/protocol-bench-demo){ .md-button }"
             )
         elif name == "specforge":
             extra = (
-                "\n[:material-database: Dataset](https://huggingface.co/datasets/nickh007/specforge){ .md-button }"
-                "\n[:material-trophy: Leaderboard](https://huggingface.co/spaces/nickh007/specforge-leaderboard){ .md-button }"
+                "\n[:material-database: Dataset]"
+                "(https://huggingface.co/datasets/nickh007/specforge){ .md-button }"
+                "\n[:material-trophy: Leaderboard]"
+                "(https://huggingface.co/spaces/nickh007/specforge-leaderboard){ .md-button }"
             )
 
         # A name cannot be both ours-on-PyPI and owned-by-someone-else. If it ever is, the tables
@@ -280,7 +287,8 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
             raise SystemExit(
                 f"REFUSING: {name} appears in BOTH ON_PYPI and NAME_TAKEN_ON_PYPI. One says we "
                 f"published it; the other says the name belongs to somebody else. Resolve the "
-                f"contradiction before generating a page that asserts either.")
+                f"contradiction before generating a page that asserts either."
+            )
 
         if not pip_installable:
             install = USES.format(name=name, github=GITHUB)
@@ -288,8 +296,7 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
             install = INSTALL_PUBLISHED.format(name=name)
         elif name in NAME_TAKEN_ON_PYPI:
             owner, owner_url = NAME_TAKEN_ON_PYPI[name]
-            install = INSTALL_NAME_TAKEN.format(name=name, github=GITHUB,
-                                                owner=owner, owner_url=owner_url)
+            install = INSTALL_NAME_TAKEN.format(name=name, github=GITHUB, owner=owner, owner_url=owner_url)
         else:
             install = INSTALL.format(name=name, github=GITHUB)
 
@@ -301,11 +308,16 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
             raise SystemExit(
                 f"REFUSING to generate {name}.md: the page would say `pip install {name}` 'does not "
                 f"work yet', but that name on PyPI belongs to {NAME_TAKEN_ON_PYPI[name][0]} and the "
-                f"command SUCCEEDS with their package. Use INSTALL_NAME_TAKEN.")
+                f"command SUCCEEDS with their package. Use INSTALL_NAME_TAKEN."
+            )
 
         page = PAGE.format(
-            name=name, tagline=tagline, description=description, github=GITHUB,
-            extra_button=extra, facts=" · ".join(facts),
+            name=name,
+            tagline=tagline,
+            description=description,
+            github=GITHUB,
+            extra_button=extra,
+            facts=" · ".join(facts),
             install=install,
             scope=honest_scope(root),
         )
@@ -319,7 +331,8 @@ def build(repos: pathlib.Path, out: pathlib.Path) -> None:
         raise SystemExit(
             f"REFUSING: {len(missing)} declared tool(s) produced no page: {missing}. Every other "
             f"page was still written, so the run is diagnosable — but a docs site missing a tool it "
-            f"declares is not a complete site.")
+            f"declares is not a complete site."
+        )
 
 
 if __name__ == "__main__":

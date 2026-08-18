@@ -70,8 +70,8 @@ def test_a_published_package_page_does_not_claim_it_is_unavailable():
             continue
         text = p.read_text(encoding="utf-8")
         assert "does not work yet" not in text, (
-            f"{name}.md says the install 'does not work yet', but we published it — "
-            f"`pip install {name}` works now")
+            f"{name}.md says the install 'does not work yet', but we published it — `pip install {name}` works now"
+        )
         assert f"pip install {name}" in text
 
 
@@ -82,7 +82,8 @@ def test_a_name_owned_by_someone_else_carries_the_STRONGER_warning():
             continue
         text = p.read_text(encoding="utf-8")
         assert "does not work yet" not in text, (
-            f"{name}.md claims the command fails; it SUCCEEDS with somebody else's package")
+            f"{name}.md claims the command fails; it SUCCEEDS with somebody else's package"
+        )
         assert "does not fail" in text and "belongs to somebody else" in text
 
 
@@ -106,8 +107,7 @@ def test_each_package_we_claim_to_have_published_really_is_on_pypi(name):
     if status is None:
         pytest.skip(f"no network — PyPI not probed for {name}; this is a SKIP, not a pass")
     assert status == 200, f"ON_PYPI declares {name} published, but PyPI returns {status}"
-    assert info["version"] == B.ON_PYPI[name], (
-        f"{name}: declared {B.ON_PYPI[name]}, PyPI has {info['version']}")
+    assert info["version"] == B.ON_PYPI[name], f"{name}: declared {B.ON_PYPI[name]}, PyPI has {info['version']}"
 
 
 @pytest.mark.parametrize("name", sorted(B.NAME_TAKEN_ON_PYPI))
@@ -118,12 +118,14 @@ def test_a_name_we_call_taken_really_does_resolve_to_someone_else(name):
         pytest.skip(f"no network — PyPI not probed for {name}; this is a SKIP, not a pass")
     assert status == 200, (
         f"NAME_TAKEN_ON_PYPI says {name} is owned by someone else, but PyPI returns {status}. "
-        f"If the name is now free the page is over-warning and should be corrected.")
+        f"If the name is now free the page is over-warning and should be corrected."
+    )
     ours = "nickharris808"
     home = (info.get("home_page") or "") + " " + json.dumps(info.get("project_urls") or {})
     assert ours not in home, (
         f"{name} on PyPI now points at our own project — it is no longer somebody else's, so the "
-        f"warning must be replaced.")
+        f"warning must be replaced."
+    )
 
 
 def test_an_unclassified_package_is_genuinely_unclaimed():
@@ -137,4 +139,41 @@ def test_an_unclassified_package_is_genuinely_unclaimed():
         assert status == 404, (
             f"{name} is documented as 'not on PyPI yet' but the name now RESOLVES ({status}). "
             f"Either we published it — add it to ON_PYPI — or somebody else did, which is the "
-            f"specforge situation and needs the stronger warning.")
+            f"specforge situation and needs the stronger warning."
+        )
+
+
+# ---------------------------------------------------------------------------
+# The guard above reads `docs/tools/` only. An adversarial pass found four live
+# false claims about the index sitting in `README.md`, `docs/guides/faq.md` and
+# `docs/index.md` — outside its scan, so it stayed green while the exact defect
+# class it exists to catch was published. Scope is now every Markdown file here.
+
+
+def _every_markdown():
+    for path in sorted(ROOT.rglob("*.md")):
+        if ".git" in path.parts or "site" in path.parts:
+            continue
+        yield path
+
+
+@pytest.mark.parametrize("name", sorted(B.ON_PYPI))
+def test_no_markdown_file_anywhere_says_a_published_package_is_unavailable(name):
+    for path in _every_markdown():
+        text = path.read_text(encoding="utf-8")
+        for phrase in (f"`pip install {name}` does not work", f"`pip install {name}` would 404"):
+            assert phrase not in text, f"{path.relative_to(ROOT)} says {phrase!r}, but {name} is on PyPI"
+
+
+def test_no_markdown_file_claims_the_whole_portfolio_is_off_the_index():
+    """A single sweeping sentence outranks every accurate per-package one next to it."""
+    sweeping = (
+        "nothing here is on PyPI",
+        "none of these are on PyPI",
+        "not published to any index",
+        "genuinely does not work today, and every README",
+    )
+    for path in _every_markdown():
+        text = path.read_text(encoding="utf-8").lower()
+        for phrase in sweeping:
+            assert phrase.lower() not in text, f"{path.relative_to(ROOT)}: {phrase!r}"

@@ -15,7 +15,8 @@ $ pip install "minicheck-mcp @ git+https://github.com/nickharris808/minicheck-mc
 ```
 
 !!! note
-    `pip install minicheck-mcp` does not work yet — nothing here is on PyPI. Install from GitHub.
+    `pip install minicheck-mcp` does not work yet — this one package is not on PyPI. Its `minicheck`
+    dependency is, and is pulled from the index automatically.
 
 ## Honest scope
 

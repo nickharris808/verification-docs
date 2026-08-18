@@ -72,10 +72,31 @@ Declarative specs are compiled once at build time into index-addressed tuples �
 `(position, value)` pairs, assignments as `(position, value)`, increments as `(position, name,
 delta)`. The hot loop does no name lookups and no `isinstance` checks on constants.
 
-Measured 2.8× over the interpreted version. The correctness argument is a differential test
-requiring the compiled and interpreted paths to agree on **every successor of every reachable
-state**, including on when to raise `IntBoundExceeded` — an optimisation that changed a verdict
-would be far worse than a slow one.
+Measured **4.6× mean** over the interpreted version (n=5 runs; per-run means 4.46–4.85×, median
+4.62×; Apple M-series, CPython 3.11, load average 8.15/9.56/10.57 at measurement). Reproduce with
+`python bench.py` in the `minicheck` repo, which re-implements the pre-optimisation transition
+function so the comparison runs from one checkout with no old release needed.
+
+The speedup depends strongly on model size, and the spread is the honest part:
+
+| model | states | interpreted | compiled | speedup |
+|---|---|---|---|---|
+| `counters_2x40` | 1681 | 38.2 ms | 5.7 ms | **6.7×** |
+| `counters_3x12` | 2197 | 24.5 ms | 5.0 ms | 4.9× |
+| `counters_4x7` | 4096 | 37.8 ms | 8.9 ms | 4.3× |
+| `ring_9` | 9 | 0.0 ms | 0.0 ms | 2.8× |
+
+!!! note "This page previously said 2.8×"
+    That was the **minimum** across the four models, not the mean — and it came from `ring_9`, a
+    9-state model whose timings round to 0.0 ms and which is therefore noise-dominated. The figure
+    was understated by roughly 65%. On the models anyone actually waits for — the thousand-state
+    ones — the measured speedup is closer to **6.7×**. Corrected 2026-07-31 after re-running the
+    committed benchmark five times; the number went up, and the range is published alongside the
+    mean so a single flattering row cannot stand in for the result.
+
+The correctness argument is a differential test requiring the compiled and interpreted paths to
+agree on **every successor of every reachable state**, including on when to raise
+`IntBoundExceeded` — an optimisation that changed a verdict would be far worse than a slow one.
 
 The one runtime check that remains is the bound on `incr`/`decr`, because that genuinely depends on
 the current value.

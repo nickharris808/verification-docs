@@ -165,15 +165,25 @@ source the way you would treat any other untrusted Python.
 
 ## "Why isn't this on PyPI?"
 
-Nothing is blocking it technically. The distributions build and pass `twine check`.
+Mostly nothing is blocking it technically. The distributions build and pass `twine check`.
 
-Two of the packages declare their `minicheck` dependency as a PEP 508 direct reference so they
-install today with no package index at all. PyPI rejects direct references on upload, so those two
-ship a `build_pypi.py` that swaps in an ordinary version constraint and builds an uploadable
-artifact — to be used once `minicheck` itself is published.
+**Three** of the packages — `protocol-bench`, `minicheck-mcp` and `specforge` — declare their
+`minicheck` dependency as a PEP 508 direct reference so they install today with no package index at
+all. PyPI rejects direct references on upload, so each ships a `build_pypi.py` that swaps in an
+ordinary version constraint and builds an uploadable artifact, to be used once `minicheck` itself is
+published.
 
-Until then `pip install <name>` genuinely does not work, and every README says so plainly rather
-than implying otherwise.
+One thing *is* blocking, for one package. **The name `specforge` on PyPI already belongs to somebody
+else** — [SGLang's SpecForge](https://github.com/sgl-project/SpecForge), an unrelated
+speculative-decoding training framework, also at version `0.1.0`. So `pip install specforge` does not
+fail; it succeeds and installs a different project. That package needs a rename before any index
+release, and its README says so at the top of its install section.
+
+Of the other five, four are on the index and install with a plain `pip install <name>`:
+`minicheck`, `protocol-bench`, `failclosed` and `polyfrac`. Only `minicheck-mcp` is still
+GitHub-only, and its README says so plainly rather than implying otherwise. Each package's
+`tests/test_install_line.py` checks its own README against the live index, so none of these
+sentences can go stale quietly again — which is why this one is written down rather than hedged.
 
 ---
 
